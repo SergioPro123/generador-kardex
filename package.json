@@ -1,0 +1,15 @@
+{
+  "name": "generador-kardex",
+  "version": "1.0.0",
+  "description": "Este es un sistema que generara un archivo excel, conteniendo el Kardex en sus tres formatos (Promedio, PEPS,UEPS)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sergio Aparicio",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "hbs": "^4.1.1"
+  }
+}

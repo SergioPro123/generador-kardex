@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Generador de Kardex</title>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="assets/css/style.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<script src="assets/js/index.js"></script>
+</head>
+
+<body>
+	<div class="container">
+		<div class="table-responsive">
+			<div class="table-wrapper">
+				<div class="table-title">
+					<div class="row">
+						<div class="col-xs-6">
+							<h2>Generador <b>Kardex</b></h2>
+						</div>
+						<div class="col-xs-6">
+							<a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"><i
+									class="material-icons">&#xE147;</i> <span>Añadir Operación</span></a>
+							<a href="#deleteEmployeeModal" class="btn btn-danger" data-toggle="modal"><i
+									class="material-icons">&#xE15C;</i> <span>Eliminar</span></a>
+						</div>
+					</div>
+				</div>
+				<table class="table table-striped table-hover">
+					<thead>
+						<tr>
+							<th>
+								<span class="custom-checkbox">
+									<input type="checkbox" id="selectAll">
+									<label for="selectAll"></label>
+								</span>
+							</th>
+							<th>Fecha</th>
+							<th>Tipo de Operación</th>
+							<th>Descripción</th>
+							<th>Cantidad</th>
+							<th>Valor Unitario</th>
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody id="tabla">
+						<tr>
+							<td>
+								<span class="custom-checkbox">
+									<input type="checkbox" id="checkbox1" name="options[]" value="1">
+									<label for="checkbox1"></label>
+								</span>
+							</td>
+							<td>Thomas Hardy</td>
+							<td>thomashardy@mail.com</td>
+							<td>89 Chiaroscuro Rd, Portland, USA lorem</td>
+							<td>(171) 555-2222</td>
+							<td>(171) 555-2222</td>
+							<td>
+								<a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons"
+										data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+								<a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i
+										class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="clearfix">
+					<div class="hint-text">Mostrando <strong id="cantidadOperaciones">0</strong> Operaciones.</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Añadir Modal HTML -->
+	<div id="addEmployeeModal" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form id="formAgregar">
+					<div class="modal-header">
+						<h4 class="modal-title">Añadir Operación</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label>Fecha</label>
+							<input type="date" class="form-control" name="fecha" required>
+						</div>
+						<div class="form-group">
+							<label>Tipo de Operación</label>
+							<select name="tipoOperacion" class="form-control" id="selectAgregar">
+								<option value="compra">Compra</option>
+								<option value="venta">Venta</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Descripción</label>
+							<textarea class="form-control" name="descripcion"></textarea>
+						</div>
+						<div class="form-group">
+							<label>Cantidad</label>
+							<input type="number" class="form-control" min="1" name="cantidad" required>
+						</div>
+						<div class="form-group" id="valorUnitarioAgregar">
+							<label>Valor Unitario</label>
+							<input type="number" class="form-control" min="1" name="valorUnitario" required>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancelar">
+						<input type="submit" class="btn btn-success" value="Añadir">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!-- Editar Modal HTML -->
+	<div id="editEmployeeModal" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form id="formEditar">
+					<div class="modal-header">
+						<h4 class="modal-title">Editar Operación</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label>Fecha</label>
+							<input type="date" class="form-control" id="fechaEdit" required>
+						</div>
+						<div class="form-group">
+							<label>Tipo de Operación</label>
+							<select name="select" class="form-control" id="tipoOperacionEdit">
+								<option value="compra" selected>Compra</option>
+								<option value="venta">Venta</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Descripción</label>
+							<textarea class="form-control" id="descripcionEdit"></textarea>
+						</div>
+						<div class="form-group">
+							<label>Cantidad</label>
+							<input type="number" class="form-control" required min="1" id="cantidadEdit">
+						</div>
+						<div class="form-group">
+							<label>Valor Unitario</label>
+							<input type="number" class="form-control" required min="1" id="valorUnitarioEdit">
+						</div>
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+						<input type="submit" class="btn btn-info" value="Save">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!-- Eliminar Modal HTML -->
+	<div id="deleteEmployeeModal" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form>
+					<div class="modal-header">
+						<h4 class="modal-title">Eliminar Operación</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">
+						<p>¿Está seguro de que desea eliminar esta operación?</p>
+						<p class="text-warning"><small>Esta acción no se puede deshacer.</small></p>
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+						<input type="submit" class="btn btn-danger" value="Delete">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>
