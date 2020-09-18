@@ -1,5 +1,9 @@
 var operaciones = 0;
 var datosOperaciones = {};
+//Esta variable contrendra el ID de un registro cuando se selecciona editar.
+var idUltimaEditacion;
+//Esta variable contendra el ID de un registro cuando se selecciona eliminar
+var idUltimaEliminacion;
 
 $(document).ready(function () {
     // Select/Deselect checkboxes
@@ -29,12 +33,12 @@ $(document).ready(function () {
         $.each(info, function (i, array) {
             datos[array.name] = array.value;
         });
-        //agregamos los datos recien añadidos a los datos totales
-        datosOperaciones[`operacion${++operaciones}`] = datos;
         //comprobamos que no haya ningun valor unitario si selecciono la opcion "venta"
         if (datos.tipoOperacion === 'venta') {
             datos.valorUnitario = '';
         }
+        //agregamos los datos recien añadidos a los datos totales
+        datosOperaciones[`operacion${++operaciones}`] = datos;
         // contruimos el registro
         let registro =
             "<tr id='operacion" +
@@ -74,36 +78,142 @@ $(document).ready(function () {
         $('#cantidadOperaciones').text(parseInt($('#cantidadOperaciones').text()) + 1);
         // Activate tooltip
         $('[data-toggle="tooltip"]').tooltip();
-        //Asociamos eventos a las etiquetas "a"
     });
 
     //Este evento captura los cambios de la entrada 'Select',
     //ya que si el motivo es de compra, se reflejara la opcion
     //de valor unitario, de lo contrario se ocultara.
     $('#selectAgregar').on('change', function () {
-        let select = $('div#valorUnitarioAgregar');
+        let divValorUnitario = $('div#valorUnitarioAgregar');
         let input = $('div#valorUnitarioAgregar input');
-        console.log();
         if ($(this).val() === 'compra') {
-            select.fadeIn(300);
+            divValorUnitario.fadeIn(300);
             input.prop('required', true);
         } else {
-            select.fadeOut(300);
+            divValorUnitario.fadeOut(300);
+            input.prop('required', false);
+        }
+    });
+    //La misma funcion, pero va enfocada al modal Editar
+    $('form#formEditar #tipoOperacionEdit').on('change', function () {
+        let divValorUnitario = $('div#valorUnitarioEditDiv');
+        let input = $('div#valorUnitarioEdit');
+        if ($(this).val() === 'compra') {
+            divValorUnitario.fadeIn(300);
+            input.prop('required', true);
+        } else {
+            divValorUnitario.fadeOut(300);
             input.prop('required', false);
         }
     });
 });
 //Esta funcion es para abrir el modal de editar, con la informació seleccionada
 $(document).on('click', 'tr td a[href = "#editEmployeeModal"]', function (event) {
-    let idOperacion = $(this).parent().parent().attr('id');
-    let select = datosOperaciones[idOperacion].tipoOperacion;
-    console.log(select);
+    idUltimaEditacion = $(this).parent().parent().attr('id');
+    let select = datosOperaciones[idUltimaEditacion].tipoOperacion;
+
+    $('form#formEditar #fechaEdit').val(datosOperaciones[idUltimaEditacion].fecha);
     if (select === 'venta') {
         $("form#formEditar #tipoOperacionEdit option[value='venta']").attr('selected', true);
+        //Ocultamos el Valor Unitario
+        $('form#formEditar #valorUnitarioEditDiv').hide();
+        $('form#formEditar #valorUnitarioEdit').prop('required', false);
     } else {
         $("form#formEditar #tipoOperacionEdit option[value='comprar']").attr('selected', true);
+        //Se muestra el valor Unitario
+        $('form#formEditar #valorUnitarioEditDiv').show();
+        $('form#formEditar #valorUnitarioEdit').prop('required', true);
+        $('form#formEditar #valorUnitarioEdit').val(datosOperaciones[idUltimaEditacion].valorUnitario);
     }
-    $('form#formEditar #descripcionEdit').val(datosOperaciones[idOperacion].descripcion);
-    $('form#formEditar #cantidadEdit').val(datosOperaciones[idOperacion].cantidad);
-    $('form#formEditar #valorUnitarioEdit').val(datosOperaciones[idOperacion].valorUnitario);
+    $('form#formEditar #descripcionEdit').val(datosOperaciones[idUltimaEditacion].descripcion);
+    $('form#formEditar #cantidadEdit').val(datosOperaciones[idUltimaEditacion].cantidad);
+});
+
+//Este evento se encarga de editar nuestros registros
+$(document).on('submit', 'form#formEditar', function (event) {
+    event.preventDefault();
+    let info = $(this).serializeArray();
+    let datos = {};
+    $.each(info, function (i, array) {
+        datos[array.name] = array.value;
+    });
+    //comprobamos que no haya ningun valor unitario si selecciono la opcion "venta"
+    if (datos.tipoOperacion === 'venta') {
+        datos.valorUnitario = '';
+    }
+    //Actualizamos de la operacion en nuestro array, que contiene todas las operaciones.
+    datosOperaciones[idUltimaEditacion] = datos;
+
+    // Recontruimos el registro
+    let registro =
+        "<td> <span class='custom-checkbox'>" +
+        "<input type='checkbox' id='checkboxOperacion" +
+        idUltimaEditacion +
+        "' name='options[]' value='" +
+        idUltimaEditacion +
+        "'>" +
+        "<label for='checkbox" +
+        idUltimaEditacion +
+        "'></label>" +
+        '</span>' +
+        '</td>' +
+        `<td>${datos.fecha}</td>` +
+        `<td>${datos.tipoOperacion.charAt(0).toUpperCase() + datos.tipoOperacion.substring(1)}</td>` +
+        `<td>${datos.descripcion}</td>` +
+        `<td>${datos.cantidad}</td>` +
+        `<td>${datos.valorUnitario || ''}</td>` +
+        '<td>' +
+        "<a href='#editEmployeeModal' class='edit' data-toggle='modal'><i class='material-icons' data-toggle='tooltip' title='Editar'>&#xE254;</i></a>" +
+        "<a href='#deleteEmployeeModal' class='delete' data-toggle='modal'><i class='material-icons' data-toggle='tooltip' title='Eliminar'>&#xE872;</i></a>" +
+        '</td>';
+    //Añadimos un nuevo registro a la tabla
+    $(`tbody#tabla tr#${idUltimaEditacion}`).html(registro);
+    //Cerramos el modal de 'Editar Operación'
+    $('#editEmployeeModal').modal('hide');
+    //Limpiamos el formulario
+    $(this)[0].reset();
+    // Activate tooltip
+    $('[data-toggle="tooltip"]').tooltip();
+});
+
+//Esta funcion es para capturar el ID del registro que se quiere eliminar
+$(document).on('click', 'tr td a[href = "#deleteEmployeeModal"]', function (event) {
+    idUltimaEliminacion = $(this).parent().parent().attr('id');
+});
+
+//Este evento se encarga de eliminar un registro seleccionado.
+$(document).on('submit', 'form#formEliminar', function (event) {
+    event.preventDefault();
+    delete datosOperaciones[idUltimaEliminacion];
+    //Cerramos el modal de 'Eliminar Operación'
+    $('#deleteEmployeeModal').modal('hide');
+    //Ocultamos primero la tabla para dar un efecto de desvanecimiento
+    $(`tbody#tabla tr#${idUltimaEliminacion}`).fadeOut(500, function () {
+        //Eliminamos la operacion de la tabla
+        $(`tbody#tabla tr#${idUltimaEliminacion}`).remove();
+    });
+    //Actualizamos la visualizacion de operaciones actuales
+    $('#cantidadOperaciones').text(parseInt($('#cantidadOperaciones').text()) - 1);
+});
+
+//Este evento se encarga de eliminar un grupo seleccionado de registro.
+$(document).on('submit', 'form#formEliminarGrupo', function (event) {
+    event.preventDefault();
+    let checkbox = $('table tbody input[type="checkbox"]');
+    let i = 0;
+    //Cerramos el modal de 'Eliminar Operación'
+    $('#deleteEmployeeModalGrupo').modal('hide');
+    checkbox.each(function () {
+        if ($(this).prop('checked')) {
+            i++;
+            let id = $(this).parent().parent().parent().attr('id');
+            delete datosOperaciones[id];
+            $(`tbody#tabla tr#${id}`).fadeOut(500, function () {
+                //Eliminamos la operacion de la tabla
+                $(`tbody#tabla tr#${id}`).remove();
+            });
+        }
+    });
+    //Actualizamos la visualizacion de operaciones actuales
+    $('#cantidadOperaciones').text(parseInt($('#cantidadOperaciones').text()) - i);
 });

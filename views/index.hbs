@@ -6,6 +6,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Generador de Kardex</title>
+	<link rel="icon" href="assets/img/icono.ico" type="image/x-icon" />
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -29,7 +30,7 @@
 						<div class="col-xs-6">
 							<a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"><i
 									class="material-icons">&#xE147;</i> <span>Añadir Operación</span></a>
-							<a href="#deleteEmployeeModal" class="btn btn-danger" data-toggle="modal"><i
+							<a href="#deleteEmployeeModalGrupo" class="btn btn-danger" data-toggle="modal"><i
 									class="material-icons">&#xE15C;</i> <span>Eliminar</span></a>
 						</div>
 					</div>
@@ -52,30 +53,22 @@
 						</tr>
 					</thead>
 					<tbody id="tabla">
-						<tr>
-							<td>
-								<span class="custom-checkbox">
-									<input type="checkbox" id="checkbox1" name="options[]" value="1">
-									<label for="checkbox1"></label>
-								</span>
-							</td>
-							<td>Thomas Hardy</td>
-							<td>thomashardy@mail.com</td>
-							<td>89 Chiaroscuro Rd, Portland, USA lorem</td>
-							<td>(171) 555-2222</td>
-							<td>(171) 555-2222</td>
-							<td>
-								<a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons"
-										data-toggle="tooltip" title="Edit">&#xE254;</i></a>
-								<a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i
-										class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
-							</td>
-						</tr>
+
+						<!-- Aqui va el contenido de registros!-->
+
 					</tbody>
 				</table>
 				<div class="clearfix">
-					<div class="hint-text">Mostrando <strong id="cantidadOperaciones">0</strong> Operaciones.</div>
+					<div class="hint-text col-xs-6">Mostrando <strong id="cantidadOperaciones">0</strong> Operaciones.
+					</div>
+					<div class="row">
+						<div class="col-xs-6">
+							<a href="#" class="btn btn-primary"><i class="material-icons">&#xe2c4;</i> <span>Generar
+									Kardex</span></a>
+						</div>
+					</div>
 				</div>
+
 			</div>
 		</div>
 	</div>
@@ -133,26 +126,28 @@
 					<div class="modal-body">
 						<div class="form-group">
 							<label>Fecha</label>
-							<input type="date" class="form-control" id="fechaEdit" required>
+							<input type="date" class="form-control" id="fechaEdit" required name="fecha">
 						</div>
 						<div class="form-group">
 							<label>Tipo de Operación</label>
-							<select name="select" class="form-control" id="tipoOperacionEdit">
+							<select name="tipoOperacion" class="form-control" id="tipoOperacionEdit">
 								<option value="compra" selected>Compra</option>
 								<option value="venta">Venta</option>
 							</select>
 						</div>
 						<div class="form-group">
 							<label>Descripción</label>
-							<textarea class="form-control" id="descripcionEdit"></textarea>
+							<textarea class="form-control" id="descripcionEdit" name="descripcion"></textarea>
 						</div>
 						<div class="form-group">
 							<label>Cantidad</label>
-							<input type="number" class="form-control" required min="1" id="cantidadEdit">
+							<input type="number" class="form-control" required min="1" id="cantidadEdit"
+								name="cantidad">
 						</div>
-						<div class="form-group">
+						<div class="form-group" id="valorUnitarioEditDiv">
 							<label>Valor Unitario</label>
-							<input type="number" class="form-control" required min="1" id="valorUnitarioEdit">
+							<input type="number" class="form-control" required min="1" id="valorUnitarioEdit"
+								name="valorUnitario">
 						</div>
 					</div>
 					<div class="modal-footer">
@@ -163,11 +158,11 @@
 			</div>
 		</div>
 	</div>
-	<!-- Eliminar Modal HTML -->
+	<!-- Eliminar Individual Modal HTML -->
 	<div id="deleteEmployeeModal" class="modal fade">
 		<div class="modal-dialog">
 			<div class="modal-content">
-				<form>
+				<form id="formEliminar">
 					<div class="modal-header">
 						<h4 class="modal-title">Eliminar Operación</h4>
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -177,8 +172,29 @@
 						<p class="text-warning"><small>Esta acción no se puede deshacer.</small></p>
 					</div>
 					<div class="modal-footer">
-						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-						<input type="submit" class="btn btn-danger" value="Delete">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancelar">
+						<input type="submit" class="btn btn-danger" value="Eliminar">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!-- Eliminar grupos Modal HTML -->
+	<div id="deleteEmployeeModalGrupo" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form id="formEliminarGrupo">
+					<div class="modal-header">
+						<h4 class="modal-title">Eliminar Operación</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">
+						<p>¿Está seguro de que desea eliminar esta operación?</p>
+						<p class="text-warning"><small>Esta acción no se puede deshacer.</small></p>
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancelar">
+						<input type="submit" class="btn btn-danger" value="Eliminar">
 					</div>
 				</form>
 			</div>
