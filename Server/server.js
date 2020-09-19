@@ -2,6 +2,13 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const hbs = require('hbs');
+const bodyParser = require('body-parser');
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse application/json
+app.use(bodyParser.json());
 
 //Traemos el archivo que contine las configuraciones
 require('./config/config');
