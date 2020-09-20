@@ -2,12 +2,25 @@
 let validarDatos = (req, res, next) => {
     let datos = new Object();
     datos = req.body;
+    if (!datos.hasOwnProperty('inventarioInicial')) {
+        //Falta el inventario Inicial
+        respuesta(res, 400, 'false', 'Falta el Inventario Inicial.');
+        return;
+    }
     //Recorremos cada una de las operaciones
     for (const operacion in datos) {
         if (datos.hasOwnProperty(operacion)) {
             //Validamos el campo 'cantidad'.
             if (!validarVariableNumerica(res, datos, operacion, 'cantidad', 1)) {
                 return;
+            }
+            //Validamos el campo 'valorUnitario'.
+            if (!validarVariableNumerica(res, datos, operacion, 'valorUnitario', 0)) {
+                return;
+            }
+            //Si se trata del Inventario Inicial, no es necesario validar el campo 'Tipo de Operacion'.
+            if (operacion == 'inventarioInicial') {
+                continue;
             }
             //Validamos el campo 'tipoOperacion'
             if (datos[operacion].hasOwnProperty('tipoOperacion')) {
@@ -21,11 +34,6 @@ let validarDatos = (req, res, next) => {
             } else {
                 //Falta valores en el campo 'tipoOperacion'.
                 respuesta(res, 400, 'false', "Falta valores en el campo 'tipo de operacion'.");
-                return;
-            }
-
-            //Validamos el campo 'valorUnitario'.
-            if (!validarVariableNumerica(res, datos, operacion, 'valorUnitario', 0)) {
                 return;
             }
         }
