@@ -11,7 +11,18 @@ se recibira un objeto con la siguiente estructura:
     }
 }
  */
-let procesarDatos = (req, res) => {};
+let procesarDatos = (req, res) => {
+    let datos = new Object();
+    datos = req.body;
+    //Recorremos cada una de las operaciones
+    for (const operacion in datos) {
+        if (datos.hasOwnProperty(operacion)) {
+            //De aqui se empieza a procesar cada operacion
+        }
+    }
+
+    res.sendStatus(200);
+};
 
 module.exports = {
     procesarDatos,
