@@ -145,6 +145,7 @@ var totalesKardex = new Object();
 
 const procesarKardexPromedio = require('./procesarKardexPromedio');
 const procesarKardexPEPS_UEPS = require('./procesarKardexPEPS_UEPS');
+const procesarTotales = require('./procesarTotales');
 
 let { clone } = require('./funciones');
 
@@ -162,6 +163,8 @@ let procesarDatos = (req, res) => {
     kardexPEPS = procesarKardexPEPS_UEPS.calculaKardexPEPS_UEPS(datos, 0);
     //Procesamos el kardex UEPS
     kardexUEPS = procesarKardexPEPS_UEPS.calculaKardexPEPS_UEPS(datos, 1);
+    //Procesamos los totales
+    totalesKardex = procesarTotales.procesarTotales(clone(kardexPromedio), clone(kardexPEPS), clone(kardexUEPS));
 
     res.sendStatus(200);
 };
