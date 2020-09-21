@@ -20,6 +20,10 @@ let calculaKardexPEPS_UEPS = (datos, PEPS_UEPS) => {
             kardex[operacion].saldos.inventarioActual.comentarios[0] = comentariosInventarioFianl;
             kardex[operacion].saldos.cantidad = clone(datos[operacion].saldos.cantidad);
             kardex[operacion].saldos.valor = clone(datos[operacion].saldos.valor);
+            kardex[operacion].cantidad = clone(datos[operacion].saldos.cantidad);
+            kardex[operacion].fecha = clone(datos[operacion].fecha);
+            kardex[operacion].descripcion = clone(datos[operacion].descripcion);
+            kardex[operacion].valorUnitario = clone(datos[operacion].valorUnitario);
             continue;
         }
         if (datos.hasOwnProperty(operacion)) {

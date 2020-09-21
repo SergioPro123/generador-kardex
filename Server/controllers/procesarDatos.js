@@ -28,7 +28,7 @@ Pomedio{
         valorUnitario,
         saldos:{
            cantidad,
-            valores 
+            valor 
         }
     },
     operacion#:{                        <---------- Si es tipo COMPRA
@@ -42,7 +42,7 @@ Pomedio{
         },
         saldos:{
            cantidad,
-            valores 
+            valor 
         }
     },
     operacion#:{                        <---------- Si es tipo Venta
@@ -56,7 +56,7 @@ Pomedio{
         },
         saldos:{
            cantidad,
-            valores 
+            valor 
         }
     },
     operacion#...
@@ -70,7 +70,7 @@ PEPS,UEPS{
         valorUnitario,
         saldos:{
            cantidad,
-            valores 
+            valor 
         }
     },
     operacion#:{                        <---------- Si es tipo COMPRA
@@ -84,7 +84,7 @@ PEPS,UEPS{
         },
         saldos:{
             cantidad,
-            valores,
+            valor,
             inventarioActual{
               cantidades:[],
               comentario:[]
@@ -106,7 +106,7 @@ PEPS,UEPS{
         },
         saldos:{
            cantidad,
-            valores,
+            valor,
             inventarioActual{
               cantidades:[],
               comentarios:[]
@@ -146,6 +146,7 @@ var totalesKardex = new Object();
 const procesarKardexPromedio = require('./procesarKardexPromedio');
 const procesarKardexPEPS_UEPS = require('./procesarKardexPEPS_UEPS');
 const procesarTotales = require('./procesarTotales');
+const { generarExcelKardex } = require('./generarExcelKardex');
 
 let { clone } = require('./funciones');
 
@@ -166,6 +167,7 @@ let procesarDatos = (req, res) => {
     //Procesamos los totales
     totalesKardex = procesarTotales.procesarTotales(clone(kardexPromedio), clone(kardexPEPS), clone(kardexUEPS));
 
+    generarExcelKardex(clone(kardexPromedio), clone(kardexPEPS), clone(kardexUEPS), clone(totalesKardex));
     res.sendStatus(200);
 };
 
