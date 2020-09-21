@@ -155,8 +155,191 @@ let procesarDatos = (req, res) => {
     calculaKardexPromedio(datos);
     //Procesamos el kardex PEPS
     calculaKardexPEPS(datos);
-    console.log(kardexPromedio);
+    //Procesamos el kardex UEPS
+    calculaKardexUEPS(datos);
+
+    console.log(JSON.stringify(kardexUEPS, null, 4));
+
     res.sendStatus(200);
+};
+
+let calculaKardexUEPS = (datos) => {
+    let i = 1;
+    //Recorremos cada una de las operaciones, se realiza el PROMEDIO PONDERADO
+    for (const operacion in datos) {
+        //Comprobamos que no sea el Inventario Inicial.
+        if (operacion === 'inventarioInicial') {
+            const cantidadesInventarioInicial = clone(datos[operacion].cantidad);
+            const comentariosInventarioFianl = `${datos[operacion].cantidad} * ${datos[operacion].valorUnitario}`;
+
+            kardexUEPS[operacion].saldos = {};
+            kardexUEPS[operacion].saldos.inventarioActual = {};
+            kardexUEPS[operacion].saldos.inventarioActual.cantidades = [];
+            kardexUEPS[operacion].saldos.inventarioActual.cantidades[0] = cantidadesInventarioInicial;
+            kardexUEPS[operacion].saldos.inventarioActual.comentarios = [];
+            kardexUEPS[operacion].saldos.inventarioActual.comentarios[0] = comentariosInventarioFianl;
+            kardexUEPS[operacion].saldos.cantidad = clone(datos[operacion].saldos.cantidad);
+            kardexUEPS[operacion].saldos.valor = clone(datos[operacion].saldos.valor);
+            continue;
+        }
+        if (datos.hasOwnProperty(operacion)) {
+            //De aqui se empieza a procesar cada operacion y a crear la variable 'kardexPromedio'
+            kardexUEPS[`operacion${i}`] = {};
+            kardexUEPS[`operacion${i}`].fecha = datos[operacion].fecha;
+            kardexUEPS[`operacion${i}`].descripcion = datos[operacion].descripcion;
+            kardexUEPS[`operacion${i}`].tipoOperacion = datos[operacion].tipoOperacion;
+            if (datos[operacion].tipoOperacion === 'compra') {
+                //Asignamos el valor unitario
+                kardexUEPS[`operacion${i}`].valorUnitario = datos[operacion].valorUnitario;
+                kardexUEPS[`operacion${i}`].entrada = {};
+                //Calculamos la cantidad de ENTRADA
+                kardexUEPS[`operacion${i}`].entrada.cantidad = datos[operacion].cantidad;
+                //Calculamos el valor de ENTRADA = cantidad * valor unitario
+                kardexUEPS[`operacion${i}`].entrada.valor =
+                    parseFloat(datos[operacion].cantidad) * parseFloat(datos[operacion].valorUnitario);
+                kardexUEPS[`operacion${i}`].saldos = {};
+                //Calculamos la cantidad de SALDOS
+                kardexUEPS[`operacion${i}`].saldos.cantidad =
+                    parseFloat(Object.values(clone(kardexUEPS))[i - 1].saldos.cantidad) +
+                    parseFloat(datos[operacion].cantidad);
+                //Calculamos el valor de SALDOS
+                kardexUEPS[`operacion${i}`].saldos.valor =
+                    parseFloat(Object.values(clone(kardexUEPS))[i - 1].saldos.valor) +
+                    parseFloat(kardexUEPS[`operacion${i}`].entrada.valor);
+                //Calculamor el inventario actual de la operacion de SALDOS
+                kardexUEPS[`operacion${i}`].saldos.inventarioActual = {};
+                kardexUEPS[`operacion${i}`].saldos.inventarioActual.cantidades = [];
+
+                //agregamos los valores que llevabamos en SALDOS de inventario Actual
+                kardexUEPS[`operacion${i}`].saldos.inventarioActual.cantidades = Object.values(clone(kardexUEPS))[
+                    i - 1
+                ].saldos.inventarioActual.cantidades;
+
+                kardexUEPS[`operacion${i}`].saldos.inventarioActual.cantidades[
+                    Object.values(clone(kardexUEPS))[i].saldos.inventarioActual.cantidades.length
+                ] = datos[operacion].cantidad;
+                //Agregamos comentarios en SALDOS
+                kardexUEPS[`operacion${i}`].saldos.inventarioActual.comentarios = [];
+                kardexUEPS[`operacion${i}`].saldos.inventarioActual.comentarios = Object.values(clone(kardexUEPS))[
+                    i - 1
+                ].saldos.inventarioActual.comentarios;
+                kardexUEPS[`operacion${i}`].saldos.inventarioActual.comentarios[
+                    Object.values(clone(kardexUEPS))[i].saldos.inventarioActual.comentarios.length
+                ] = `${datos[operacion].cantidad} * ${datos[operacion].valorUnitario}`;
+                console.log(Object.values(clone(kardexUEPS))[i].saldos.inventarioActual);
+            } else {
+                //Calculamos la cantidad de SALIDA
+                kardexUEPS[`operacion${i}`].salida = {};
+                kardexUEPS[`operacion${i}`].salida.cantidad = datos[operacion].cantidad;
+
+                kardexUEPS[`operacion${i}`].saldos = {};
+
+                let inventarioActual = Object.values(clone(kardexUEPS))[i - 1].saldos.inventarioActual;
+
+                let cantidadSalida = clone(kardexUEPS[`operacion${i}`].salida.cantidad);
+                //Actualizamos el inventario actual de Saldos
+
+                kardexUEPS[`operacion${i}`].saldos.inventarioActual = {};
+                calcularInventarioActualUEPS(
+                    inventarioActual,
+                    cantidadSalida,
+                    (data, valorSalida, inventario, valorUnitario) => {
+                        kardexUEPS[`operacion${i}`].salida.unidadesVendidas = data;
+                        kardexUEPS[`operacion${i}`].salida.valor = valorSalida;
+
+                        kardexUEPS[`operacion${i}`].saldos.inventarioActual = inventario;
+
+                        kardexUEPS[`operacion${i}`].valorUnitario = [];
+                        kardexUEPS[`operacion${i}`].valorUnitario = valorUnitario;
+                    }
+                );
+                //Calculamos la cantidad de SALDOS
+                kardexUEPS[`operacion${i}`].saldos.cantidad =
+                    parseFloat(Object.values(kardexUEPS)[i - 1].saldos.cantidad) -
+                    parseFloat(datos[operacion].cantidad);
+                //Calculamos el valor de SALDOS
+                kardexUEPS[`operacion${i}`].saldos.valor =
+                    parseFloat(Object.values(kardexUEPS)[i - 1].saldos.valor) -
+                    parseFloat(kardexUEPS[`operacion${i}`].salida.valor);
+            }
+        }
+        i++;
+    }
+};
+
+let calcularInventarioActualUEPS = (inventarioActual, cantidadSalida, callback) => {
+    let unidadesVendidas = {};
+    //Reiniciamos la variable global 'unidadesVendidas'.
+    unidadesVendidas.cantidades = [];
+    unidadesVendidas.comentarios = [];
+    //[0] = valores
+    //[1] = comentarios
+
+    let data = Object.values(inventarioActual);
+    //Esta variable contiene el valor de la SALIDA
+    let valorSalida = 0;
+    //La data se devolvera en un Objeto
+    let objetoData = {};
+    objetoData.cantidades = [];
+    objetoData.comentarios = [];
+
+    let valorUnitarioArray = [];
+    //Cantidad que vamos a descontar del inventario
+    let cantidad = parseFloat(cantidadSalida);
+    let ciclo = 0;
+    for (let i = data[0].length - 1; i >= 0; i--) {
+        if (parseFloat(data[0][i]) > cantidad) {
+            data[0][i] = parseFloat(data[0][i]) - cantidad;
+            let comentario = data[1][i].split(' ');
+            data[1][i] = `${data[0][i]} * ${comentario[2]}`;
+
+            valorUnitarioArray[ciclo] = parseFloat(comentario[2]);
+
+            unidadesVendidas.cantidades[ciclo] = cantidad;
+            unidadesVendidas.comentarios[ciclo] = `${cantidad} * ${comentario[2]}`;
+
+            valorSalida += cantidad * parseFloat(comentario[2]);
+
+            objetoData.cantidades = data[0];
+            objetoData.comentarios = data[1];
+
+            callback(unidadesVendidas, valorSalida, objetoData, valorUnitarioArray);
+            return;
+        } else if (parseFloat(data[0][i]) < cantidad) {
+            cantidad -= parseFloat(data[0][i]);
+
+            let valorUnitario = data[1][i].split(' ');
+
+            valorSalida += parseFloat(data[0][i]) * parseFloat(valorUnitario[2]);
+
+            valorUnitarioArray[ciclo] = parseFloat(valorUnitario[2]);
+
+            unidadesVendidas.cantidades[ciclo] = data[0][i];
+            unidadesVendidas.comentarios[ciclo] = data[1][i];
+            //Eliminamos del inventario
+            data[0].splice(i, 1);
+            data[1].splice(i, 1);
+        } else {
+            let valorUnitario = data[1][i].split(' ');
+
+            valorSalida += parseFloat(data[0][i]) * parseFloat(valorUnitario[2]);
+
+            valorUnitarioArray[ciclo] = parseFloat(valorUnitario[2]);
+
+            unidadesVendidas.cantidades[ciclo] = data[0][1];
+            unidadesVendidas.comentarios[ciclo] = data[1][1];
+            //Eliminamos del inventario
+            data[1].splice(i, 1);
+            data[0].splice(i, 1);
+
+            objetoData.cantidades = data[0];
+            objetoData.comentarios = data[1];
+
+            callback(unidadesVendidas, valorSalida, objetoData, valorUnitarioArray);
+            return;
+        }
+        ciclo++;
+    }
 };
 
 let calculaKardexPEPS = (datos) => {
@@ -176,7 +359,6 @@ let calculaKardexPEPS = (datos) => {
             kardexPEPS[operacion].saldos.inventarioActual.comentarios[0] = comentariosInventarioFianl;
             kardexPEPS[operacion].saldos.cantidad = clone(datos[operacion].saldos.cantidad);
             kardexPEPS[operacion].saldos.valor = clone(datos[operacion].saldos.valor);
-            //console.log(kardexPEPS[operacion].saldos.inventarioActual);
             continue;
         }
         if (datos.hasOwnProperty(operacion)) {
