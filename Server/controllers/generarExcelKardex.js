@@ -1,8 +1,5 @@
 const excelJS = require('exceljs');
-
-const workbook = new excelJS.Workbook();
-workbook.creator = 'Sergio Aparicio';
-workbook.created = new Date();
+var streamBuffers = require('stream-buffers');
 
 let nombreHojas = ['PROMEDIO', 'PEPS', 'UEPS'];
 let tamanioColumnas = [13, 33, 12, 14, 14, 8, 15, 15, 8, 15, 15, 8];
@@ -13,9 +10,14 @@ let generarExcelKardex = (kardexPromedio, kardexPEPS, kardexUEPS, totalesKardex,
     let kardexs = [kardexPromedio, kardexPEPS, kardexUEPS];
     let nombreTotales = ['kardexPromedio', 'kardexPEPS', 'kardexUEPS'];
     //Obtenemos la longitudad de los karde o numero de operaciones
+    numeroOperaciones = 0;
     for (operacion in kardexPromedio) {
         numeroOperaciones++;
     }
+    const workbook = new excelJS.Workbook();
+    workbook.creator = 'Sergio Aparicio';
+    workbook.created = new Date();
+
     for (i = 0; i < 3; i++) {
         //Creamos una nueva hoja
         const sheet = workbook.addWorksheet(nombreHojas[i]);
@@ -30,11 +32,6 @@ let generarExcelKardex = (kardexPromedio, kardexPEPS, kardexUEPS, totalesKardex,
         crearEncabezadoExcel(sheet);
         inclustarInformacion(sheet, kardexs[i], totalesKardex, nombreTotales[i]);
     }
-
-    // save workbook to disk
-    /*  workbook.xlsx.writeFile('Kardex.xlsx').then(function () {
-        console.log('saved');
-    }); */
 
     // Retornamos el excel al cliente
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

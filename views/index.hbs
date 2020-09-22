@@ -14,7 +14,7 @@
 	<link rel="stylesheet" href="assets/css/style.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
+	<script src="assets/lib/jszip.js"></script>
 	<script src="assets/js/index.js"></script>
 </head>
 
@@ -53,17 +53,29 @@
 						</tr>
 					</thead>
 					<tbody id="tabla">
-
+						<tr id='inventarioInicial'>
+							<td></td>
+							<td>{{fechaActual}}</td>
+							<td>Inventario Inicial</td>
+							<td></td>
+							<td>1</td>
+							<td>1</td>
+							<td>
+								<a href='#editEmployeeModalInventario' class='edit' data-toggle='modal'><i
+										class='material-icons' data-toggle='tooltip' title='Editar'>&#xE254;</i></a>
+							</td>
+						</tr>
 						<!-- Aqui va el contenido de registros!-->
 
 					</tbody>
 				</table>
 				<div class="clearfix">
-					<div class="hint-text col-xs-6">Mostrando <strong id="cantidadOperaciones">0</strong> Operaciones.
+					<div class="hint-text col-xs-6">Mostrando <strong id="cantidadOperaciones">1</strong> Operaciones.
 					</div>
 					<div class="row">
 						<div class="col-xs-6">
-							<a href="#" class="btn btn-primary"><i class="material-icons">&#xe2c4;</i> <span>Generar
+							<a id="generarKardex" href="#generarKardex" class="btn btn-primary"><i
+									class="material-icons">&#xe2c4;</i> <span>Generar
 									Kardex</span></a>
 						</div>
 					</div>
@@ -114,6 +126,7 @@
 			</div>
 		</div>
 	</div>
+
 	<!-- Editar Modal HTML -->
 	<div id="editEmployeeModal" class="modal fade">
 		<div class="modal-dialog">
@@ -147,6 +160,44 @@
 						<div class="form-group" id="valorUnitarioEditDiv">
 							<label>Valor Unitario</label>
 							<input type="number" class="form-control" required min="1" id="valorUnitarioEdit"
+								name="valorUnitario">
+						</div>
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+						<input type="submit" class="btn btn-info" value="Save">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!-- Editar Modal de INVENTARIO INICIAL HTML -->
+	<div id="editEmployeeModalInventario" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form id="formEditarInventario">
+					<div class="modal-header">
+						<h4 class="modal-title">Editar Inventario Inicial</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label>Fecha</label>
+							<input type="date" class="form-control" id="fechaEditInventario" required name="fecha">
+						</div>
+
+						<div class="form-group">
+							<label>Descripción</label>
+							<textarea class="form-control" id="descripcionEditInventario" name="descripcion"></textarea>
+						</div>
+						<div class="form-group">
+							<label>Cantidad</label>
+							<input type="number" class="form-control" required min="1" id="cantidadEditInventario"
+								name="cantidad">
+						</div>
+						<div class="form-group" id="valorUnitarioEditDiv">
+							<label>Valor Unitario</label>
+							<input type="number" class="form-control" required min="1" id="valorUnitarioEditInventario"
 								name="valorUnitario">
 						</div>
 					</div>
