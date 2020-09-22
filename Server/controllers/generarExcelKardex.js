@@ -6,10 +6,16 @@ workbook.created = new Date();
 
 let nombreHojas = ['PROMEDIO', 'PEPS', 'UEPS'];
 let tamanioColumnas = [13, 33, 12, 14, 14, 8, 15, 15, 8, 15, 15, 8];
+
+var numeroOperaciones = 0;
 //Construimos el archivo excel
 let generarExcelKardex = (kardexPromedio, kardexPEPS, kardexUEPS, totalesKardex) => {
     let kardexs = [kardexPromedio, kardexPEPS, kardexUEPS];
     let nombreTotales = ['kardexPromedio', 'kardexPEPS', 'kardexUEPS'];
+    //Obtenemos la longitudad de los karde o numero de operaciones
+    for (operacion in kardexPromedio) {
+        numeroOperaciones++;
+    }
     for (i = 0; i < 3; i++) {
         //Creamos una nueva hoja
         const sheet = workbook.addWorksheet(nombreHojas[i]);
@@ -68,13 +74,31 @@ let inclustarInformacion = (sheet, kardex, totalesKardex, nombreTotales) => {
                 sheet.getCell('E' + i).value = kardex[operacion].entrada.valor;
             }
             //Añadimos el efecto al borde derecho
-            sheet.getCell('E1').border = {
+            sheet.getCell('E' + i).border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'mediumDashDot' },
+            };
+            //Añadimos el efecto al borde derecho
+            sheet.getCell('H' + i).border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'mediumDashDot' },
+            };
+            //Añadimos el efecto al borde derecho
+            sheet.getCell('K' + i).border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
                 right: { style: 'mediumDashDot' },
             };
             //Preguntamos si exite la propiedad 'salida'
             if (kardex[operacion].hasOwnProperty('salida')) {
                 sheet.getCell('G' + i).value = kardex[operacion].salida.cantidad;
                 sheet.getCell('H' + i).value = kardex[operacion].salida.valor;
+
                 //Preguntamos si exite la propiedad 'unidadesVendidas'
                 if (kardex[operacion].salida.hasOwnProperty('unidadesVendidas')) {
                     let longitud = Object.values(kardex)[i - 12].salida.unidadesVendidas.cantidades.length;
@@ -121,12 +145,27 @@ let inclustarInformacion = (sheet, kardex, totalesKardex, nombreTotales) => {
 let inclustarTotales = (sheet, totalesKardex, nombreTotales, i) => {
     sheet.getCell('D' + i).value = totalesKardex[nombreTotales].compras.cantidad;
     sheet.getCell('E' + i).value = totalesKardex[nombreTotales].compras.valor;
+    colorCeldas(sheet, 'D' + i);
+    colorCeldas(sheet, 'E' + i);
+    sheet.mergeCells(`D${i + 1}:E${i + 1}`);
+    sheet.getCell('D' + (i + 1)).value = 'COMPRAS';
+    colorCeldas(sheet, 'D' + (i + 1));
 
     sheet.getCell('G' + i).value = totalesKardex[nombreTotales].costoMateriales.cantidad;
     sheet.getCell('H' + i).value = totalesKardex[nombreTotales].costoMateriales.valor;
+    colorCeldas(sheet, 'G' + i);
+    colorCeldas(sheet, 'H' + i);
+    sheet.mergeCells(`G${i + 1}:H${i + 1}`);
+    sheet.getCell('G' + (i + 1)).value = 'COSTO MATERIALES';
+    colorCeldas(sheet, 'G' + (i + 1));
 
     sheet.getCell('J' + i).value = totalesKardex[nombreTotales].inventarioFinal.cantidad;
     sheet.getCell('K' + i).value = totalesKardex[nombreTotales].inventarioFinal.valor;
+    colorCeldas(sheet, 'J' + i);
+    colorCeldas(sheet, 'K' + i);
+    sheet.mergeCells(`J${i + 1}:K${i + 1}`);
+    sheet.getCell('J' + (i + 1)).value = 'INVENTARIO FINAL MATERIALES';
+    colorCeldas(sheet, 'J' + (i + 1));
 };
 
 let crearEncabezadoExcel = (sheet) => {
@@ -159,21 +198,27 @@ let crearEncabezadoExcel = (sheet) => {
     //Empezamos a crear la parte superior de la tabla
     sheet.getCell('A10').value = 'Fecha';
     bold(sheet, 'A10');
+    colorCeldas(sheet, 'A10');
     sheet.mergeCells('B10:B11');
     sheet.getCell('B10').value = 'Detalle';
     bold(sheet, 'B10');
+    colorCeldas(sheet, 'B10');
     sheet.mergeCells('C10:C11');
     sheet.getCell('C10').value = 'Valor Unitario';
     bold(sheet, 'C10');
+    colorCeldas(sheet, 'C10');
     sheet.mergeCells('D10:F10');
     sheet.getCell('D10').value = 'Entradas';
     bold(sheet, 'D10');
+    colorCeldas(sheet, 'D10');
     sheet.mergeCells('G10:I10');
     sheet.getCell('G10').value = 'Salidas';
     bold(sheet, 'G10');
+    colorCeldas(sheet, 'G10');
     sheet.mergeCells('J10:L10');
     sheet.getCell('J10').value = 'Saldos';
     bold(sheet, 'J10');
+    colorCeldas(sheet, 'J10');
 
     sheet.getCell('A11').value = 'dd/mm/aaaa';
     sheet.getCell('D11').value = 'Cantidad';
@@ -188,7 +233,14 @@ let crearEncabezadoExcel = (sheet) => {
 
     return;
 };
-
+let colorCeldas = (sheet, cell) => {
+    sheet.getCell(cell).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFA6A6A6' },
+        bgColor: { argb: 'FFFFFFFF' },
+    };
+};
 let alignmentCells = (sheet) => {
     let letrasColumna = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
     //Columna
@@ -200,8 +252,32 @@ let alignmentCells = (sheet) => {
                 horizontal: 'center',
                 wrapText: true,
             };
+            //Damos borde
+            if (j < numeroOperaciones + 12) {
+                bordeCell(sheet, `${letrasColumna[i - 1]}${j}`);
+            }
         }
     }
+    //Damos borde a los totales
+    bordeCell(sheet, 'D' + (numeroOperaciones + 12));
+    bordeCell(sheet, 'E' + (numeroOperaciones + 12));
+    bordeCell(sheet, 'G' + (numeroOperaciones + 12));
+    bordeCell(sheet, 'H' + (numeroOperaciones + 12));
+    bordeCell(sheet, 'J' + (numeroOperaciones + 12));
+    bordeCell(sheet, 'K' + (numeroOperaciones + 12));
+
+    bordeCell(sheet, 'D' + (numeroOperaciones + 13));
+    bordeCell(sheet, 'G' + (numeroOperaciones + 13));
+    bordeCell(sheet, 'J' + (numeroOperaciones + 13));
+};
+
+let bordeCell = (sheet, cell) => {
+    sheet.getCell(cell).border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+    };
 };
 
 let bold = (sheet, cell) => {
