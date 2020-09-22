@@ -22,8 +22,8 @@ let calculaKardexPEPS_UEPS = (datos, PEPS_UEPS) => {
             kardex[operacion].saldos.valor = clone(datos[operacion].saldos.valor);
             kardex[operacion].cantidad = clone(datos[operacion].saldos.cantidad);
             kardex[operacion].fecha = clone(datos[operacion].fecha);
-            kardex[operacion].descripcion = clone(datos[operacion].descripcion);
             kardex[operacion].valorUnitario = clone(datos[operacion].valorUnitario);
+            kardex[operacion].descripcion = 'Inventario Inicial';
             continue;
         }
         if (datos.hasOwnProperty(operacion)) {
@@ -149,6 +149,25 @@ let calcularInventarioActualPEPS = (inventarioActual, cantidadSalida, callback) 
     let cantidad = parseFloat(cantidadSalida);
     let ciclo = 0;
     for (let i = 0; i < data[0].length; i++) {
+        //Preguntamos si hay cantidad disponible para vender
+        if (parseFloat(data[0][i]) < cantidad && data[0][i + 1] == undefined) {
+            data[0][i] = parseFloat(data[0][0]) - cantidad;
+            let comentario = data[1][0].split(' ');
+            data[1][i] = `${data[0][i]} * ${comentario[2]}`;
+
+            valorUnitarioArray[ciclo] = parseFloat(comentario[2]);
+
+            unidadesVendidas.cantidades[ciclo] = cantidad;
+            unidadesVendidas.comentarios[ciclo] = `${cantidad} * ${comentario[2]}`;
+
+            valorSalida += cantidad * parseFloat(comentario[2]);
+
+            objetoData.cantidades = data[0];
+            objetoData.comentarios = data[1];
+
+            callback(unidadesVendidas, valorSalida, objetoData, valorUnitarioArray);
+            return;
+        }
         if (parseFloat(data[0][i]) > cantidad) {
             data[0][i] = parseFloat(data[0][i]) - cantidad;
             let comentario = data[1][i].split(' ');
@@ -224,6 +243,25 @@ let calcularInventarioActualUEPS = (inventarioActual, cantidadSalida, callback) 
     let cantidad = parseFloat(cantidadSalida);
     let ciclo = 0;
     for (let i = data[0].length - 1; i >= 0; i--) {
+        //Preguntamos si hay cantidad disponible para vender
+        if (parseFloat(data[0][i]) < cantidad && data[0][i - 1] == undefined) {
+            data[0][i] = parseFloat(data[0][0]) - cantidad;
+            let comentario = data[1][0].split(' ');
+            data[1][i] = `${data[0][i]} * ${comentario[2]}`;
+
+            valorUnitarioArray[ciclo] = parseFloat(comentario[2]);
+
+            unidadesVendidas.cantidades[ciclo] = cantidad;
+            unidadesVendidas.comentarios[ciclo] = `${cantidad} * ${comentario[2]}`;
+
+            valorSalida += cantidad * parseFloat(comentario[2]);
+
+            objetoData.cantidades = data[0];
+            objetoData.comentarios = data[1];
+
+            callback(unidadesVendidas, valorSalida, objetoData, valorUnitarioArray);
+            return;
+        }
         if (parseFloat(data[0][i]) > cantidad) {
             data[0][i] = parseFloat(data[0][i]) - cantidad;
             let comentario = data[1][i].split(' ');

@@ -132,7 +132,6 @@ $(document).on('click', 'tr td a[href = "#editEmployeeModal"]', function (event)
 
     $('form#formEditar #fechaEdit').val(datosOperaciones[idUltimaEditacion].fecha);
     if (select === 'venta') {
-        q;
         $("form#formEditar #tipoOperacionEdit option[value='venta']").attr('selected', true);
         //Ocultamos el Valor Unitario
         $('form#formEditar #valorUnitarioEditDiv').hide();
@@ -300,17 +299,26 @@ function download(data) {
         },
     })
         .then((res) => {
-            res.blob();
-            console.log(res);
+            if (res.status == 200) {
+                return res.blob();
+            } else {
+                return res.json();
+            }
         })
         .catch((error) => console.error('Error:', error))
         .then((blob) => {
-            var url = window.URL.createObjectURL(blob);
-            var a = document.createElement('a');
-            a.href = url;
-            a.download = 'Kardex.xlsx';
-            document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
-            a.click();
-            a.remove(); //afterwards we remove the element again
+            if (blob != undefined) {
+                if (!blob.ok) {
+                    var url = window.URL.createObjectURL(blob);
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'Kardex.xlsx';
+                    document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+                    a.click();
+                    a.remove(); //afterwards we remove the element again
+                } else {
+                    alert(`Error: ${blob.err.message}`);
+                }
+            }
         });
 }

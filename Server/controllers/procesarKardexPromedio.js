@@ -19,9 +19,8 @@ let calculaKardexPromedio = (datos) => {
             kardex[operacion].saldos.valor = clone(datos[operacion].saldos.valor);
             kardex[operacion].cantidad = clone(datos[operacion].saldos.cantidad);
             kardex[operacion].fecha = clone(datos[operacion].fecha);
-            kardex[operacion].descripcion = clone(datos[operacion].descripcion);
             kardex[operacion].valorUnitario = clone(datos[operacion].valorUnitario);
-
+            kardex[operacion].descripcion = 'Inventario Inicial';
             continue;
         }
         if (datos.hasOwnProperty(operacion)) {
