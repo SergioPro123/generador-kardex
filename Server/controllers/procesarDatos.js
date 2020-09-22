@@ -167,8 +167,7 @@ let procesarDatos = (req, res) => {
     //Procesamos los totales
     totalesKardex = procesarTotales.procesarTotales(clone(kardexPromedio), clone(kardexPEPS), clone(kardexUEPS));
 
-    generarExcelKardex(clone(kardexPromedio), clone(kardexPEPS), clone(kardexUEPS), clone(totalesKardex));
-    res.sendStatus(200);
+    generarExcelKardex(clone(kardexPromedio), clone(kardexPEPS), clone(kardexUEPS), clone(totalesKardex), res);
 };
 
 module.exports = {

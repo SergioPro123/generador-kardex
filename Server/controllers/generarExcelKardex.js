@@ -9,7 +9,7 @@ let tamanioColumnas = [13, 33, 12, 14, 14, 8, 15, 15, 8, 15, 15, 8];
 
 var numeroOperaciones = 0;
 //Construimos el archivo excel
-let generarExcelKardex = (kardexPromedio, kardexPEPS, kardexUEPS, totalesKardex) => {
+let generarExcelKardex = (kardexPromedio, kardexPEPS, kardexUEPS, totalesKardex, res) => {
     let kardexs = [kardexPromedio, kardexPEPS, kardexUEPS];
     let nombreTotales = ['kardexPromedio', 'kardexPEPS', 'kardexUEPS'];
     //Obtenemos la longitudad de los karde o numero de operaciones
@@ -32,8 +32,15 @@ let generarExcelKardex = (kardexPromedio, kardexPEPS, kardexUEPS, totalesKardex)
     }
 
     // save workbook to disk
-    workbook.xlsx.writeFile('Kardex.xlsx').then(function () {
+    /*  workbook.xlsx.writeFile('Kardex.xlsx').then(function () {
         console.log('saved');
+    }); */
+
+    // Retornamos el excel al cliente
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=' + 'Kardex.xlsx');
+    return workbook.xlsx.write(res).then(function () {
+        res.status(200).end();
     });
 };
 //Esta funcion se encargara de pasar las variable que contiene la informacion
