@@ -38,16 +38,22 @@ let validarDatos = (req, res, next) => {
             }
         }
     }
+
     //Si llega acá, es por que la validacion fue exitosa.
     next();
 };
 
 let validarVariableNumerica = (res, datos, operacion, nombreVariable, min) => {
+    //Por si esta vacia, es valido
+    if (datos[operacion][nombreVariable] == '') {
+        return true;
+    }
     if (datos[operacion].hasOwnProperty(nombreVariable)) {
         //Validamos que sea un numero entero
+
         if (isNumber(datos[operacion][nombreVariable])) {
             //Comprobamos que sea mayor que cero.
-            if (!(parseInt(datos[operacion][nombreVariable]) >= min)) {
+            if (!(parseFloat(datos[operacion][nombreVariable]) >= min)) {
                 //El campo no es un numero entero.
                 respuesta(res, 400, 'false', `Inconsistencia numerica en el campo. '${nombreVariable}'.`);
                 return false;

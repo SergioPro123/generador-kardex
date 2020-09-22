@@ -53,7 +53,7 @@ $(document).ready(function () {
         });
         //comprobamos que no haya ningun valor unitario si selecciono la opcion "venta"
         if (datos.tipoOperacion === 'venta') {
-            datos.valorUnitario = '';
+            datos.valorUnitario = '0';
         }
         //agregamos los datos recien añadidos a los datos totales
         datosOperaciones[`operacion${++operaciones}`] = datos;
@@ -171,7 +171,7 @@ $(document).on('submit', 'form#formEditar', function (event) {
     });
     //comprobamos que no haya ningun valor unitario si selecciono la opcion "venta"
     if (datos.tipoOperacion === 'venta') {
-        datos.valorUnitario = '';
+        datos.valorUnitario = '0';
     }
     //Actualizamos de la operacion en nuestro array, que contiene todas las operaciones.
     datosOperaciones[idUltimaEditacion] = datos;
@@ -299,7 +299,10 @@ function download(data) {
             'Content-Type': 'application/json',
         },
     })
-        .then((res) => res.blob())
+        .then((res) => {
+            res.blob();
+            console.log(res);
+        })
         .catch((error) => console.error('Error:', error))
         .then((blob) => {
             var url = window.URL.createObjectURL(blob);
